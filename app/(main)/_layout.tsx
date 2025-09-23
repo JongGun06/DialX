@@ -1,12 +1,13 @@
-// app/(main)/_layout.tsx
-
 import React from 'react';
 import { Drawer } from 'expo-router/drawer';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
 import DrawerContent from '@/components/navigation/DrawerContent';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function MainLayout() {
+  const { theme } = useTheme();
+  const Colors = theme;
+
   return (
     <Drawer
       drawerContent={(props) => <DrawerContent {...props} />}
@@ -49,6 +50,15 @@ export default function MainLayout() {
         }}
       />
       <Drawer.Screen
+        name="characters/create"
+        options={{
+          title: 'Новый персонаж',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="search"
         options={{
           title: 'Поиск',
@@ -83,8 +93,6 @@ export default function MainLayout() {
       <Drawer.Screen name="chats/finalize" options={{ drawerItemStyle: { display: 'none' } }} />
       <Drawer.Screen name="chats/info/[id]" options={{ drawerItemStyle: { display: 'none' } }} />
       <Drawer.Screen name="premium" options={{ drawerItemStyle: { display: 'none' } }} />
-      {/* <Drawer.Screen name="settings" options={{ drawerItemStyle: { display: 'none' } }} /> */} 
-      {/* ^-- УДАЛИЛ ЭТУ ЛИШНЮЮ СТРОКУ --^ */}
     </Drawer>
   );
 }

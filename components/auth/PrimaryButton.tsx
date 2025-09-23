@@ -1,13 +1,6 @@
-// components/auth/PrimaryButton.tsx
 import React from 'react';
-import {
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  TouchableOpacityProps,
-} from 'react-native';
-import { Colors } from '@/constants/Colors';
+import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, TouchableOpacityProps } from 'react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Props extends TouchableOpacityProps {
   title: string;
@@ -15,9 +8,13 @@ interface Props extends TouchableOpacityProps {
 }
 
 export default function PrimaryButton({ title, isLoading, style, ...props }: Props) {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   return (
     <TouchableOpacity
-      style={[styles.button, style]}
+      style={[styles.button, { backgroundColor: Colors.primary }, style]}
       disabled={isLoading}
       {...props}
     >
@@ -30,9 +27,8 @@ export default function PrimaryButton({ title, isLoading, style, ...props }: Pro
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   button: {
-    backgroundColor: Colors.primary,
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',

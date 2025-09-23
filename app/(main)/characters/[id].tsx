@@ -1,20 +1,21 @@
-// app/(main)/characters/[id].tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { io, Socket } from 'socket.io-client';
-
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
 import { useGetAiMessagesQuery } from '@/store/services/aiCharactersApi';
 import { API_BASE_URL } from '@/constants/api';
-import { Colors } from '@/constants/Colors';
 import { Message } from '@/types/chat';
-
 import MessageBubble from '@/components/chat/MessageBubble';
 import MessageInput from '@/components/chat/MessageInput';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function AiChatScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const { id: characterId, name } = useLocalSearchParams<{ id: string; name: string; avatarUrl: string }>();
   const currentUser = useAppSelector(selectCurrentUser);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
@@ -53,7 +54,6 @@ export default function AiChatScreen() {
   }, [accessToken, characterId]);
 
   const handleSend = (content: string) => {
-    // ИСПРАВЛЕНИЕ ЗДЕСЬ: используем socketRef.current
     if (socketRef.current && currentUser) {
       setIsSending(true);
       const userMessage: Message = {
@@ -64,7 +64,6 @@ export default function AiChatScreen() {
       };
       setLiveMessages((prevMessages) => [...prevMessages, userMessage]);
 
-      // И ИСПРАВЛЕНИЕ ЗДЕСЬ: используем socketRef.current
       socketRef.current.emit('sendMessageToAi', {
         characterId,
         content,
@@ -118,7 +117,7 @@ export default function AiChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,

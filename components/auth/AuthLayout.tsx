@@ -6,8 +6,9 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Colors } from '@/constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { defaultTheme as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
+
 
 
 type Props = {

@@ -1,17 +1,18 @@
-// app/(main)/search.tsx
-
 import React, { useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, Image, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
 import { useSearchUsersQuery } from '@/store/services/profileApi';
 import { useCreateOrFindPrivateChatMutation } from '@/store/services/chatsApi';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Colors } from '@/constants/Colors';
 import { Profile } from '@/types/chat';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function SearchScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
@@ -64,7 +65,7 @@ export default function SearchScreen() {
             disabled={isCreatingChat}
           >
             <Image 
-              source={{ uri: item.avatarUrl || `https://i.pravatar.cc/150?u=${item.id}` }} 
+              source={{ uri: item.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg` }} 
               style={styles.avatar} 
             />
             <Text style={styles.username}>{item.username}</Text>
@@ -80,7 +81,7 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -113,6 +114,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 12,
+    backgroundColor: Colors.surface,
   },
   username: {
     flex: 1,

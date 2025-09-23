@@ -1,4 +1,3 @@
-// app/(auth)/login.tsx
 import React from 'react';
 import { View, StyleSheet, Alert, Text, Pressable } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
@@ -6,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Colors } from '@/constants/Colors'; // <-- Вот этот импорт
 import AuthLayout from '@/components/auth/AuthLayout';
 import StyledInput from '@/components/auth/StyledInput';
 import PrimaryButton from '@/components/auth/PrimaryButton';
@@ -14,6 +12,7 @@ import { useLoginMutation } from '@/store/services/authApi';
 import { useAppDispatch } from '@/hooks/redux';
 import { setCredentials } from '@/store/slices/authSlice';
 import { AuthCredentials } from '@/types/auth';
+import { useTheme } from '@/hooks/useTheme';
 
 const loginSchema = z.object({
   email: z.string().email('Неверный формат email'),
@@ -21,17 +20,15 @@ const loginSchema = z.object({
 });
 
 export default function LoginScreen() {
-  // ... остальная логика компонента не меняется
-  // ... скопируй этот файл целиком, чтобы быть уверенным
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<AuthCredentials>({
+  const { control, handleSubmit, formState: { errors } } = useForm<AuthCredentials>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
@@ -41,7 +38,6 @@ export default function LoginScreen() {
       const tokens = await login(data).unwrap();
       await SecureStore.setItemAsync('accessToken', tokens.accessToken);
       await SecureStore.setItemAsync('refreshToken', tokens.refreshToken);
-      console.log("LOGIN TOKENS", tokens);
       dispatch(setCredentials(tokens));
       router.replace('/(main)/chats');
     } catch (err: any) {
@@ -97,7 +93,7 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,

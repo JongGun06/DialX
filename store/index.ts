@@ -9,6 +9,8 @@ import { filesApi } from './services/filesApi';
 import { aiCharactersApi } from './services/aiCharactersApi';
 import { stripeApi } from './services/stripeApi'; // <-- ДОБАВЛЕНО
 import authReducer, { logout } from './slices/authSlice';
+import presenceReducer from './slices/presenceSlice'; // <-- ДОБАВЛЕНО
+
 
 const appReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
@@ -18,6 +20,7 @@ const appReducer = combineReducers({
   [aiCharactersApi.reducerPath]: aiCharactersApi.reducer,
   [stripeApi.reducerPath]: stripeApi.reducer, // <-- ДОБАВЛЕНО
   auth: authReducer,
+  presence: presenceReducer,
 });
 
 const rootReducer = (state: any, action: any) => {
@@ -29,6 +32,7 @@ const rootReducer = (state: any, action: any) => {
 
 export const store = configureStore({
   reducer: rootReducer,
+  
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
@@ -36,7 +40,7 @@ export const store = configureStore({
       profileApi.middleware,
       filesApi.middleware,
       aiCharactersApi.middleware,
-      stripeApi.middleware // <-- ДОБАВЛЕНО
+      stripeApi.middleware,
     ),
 });
 

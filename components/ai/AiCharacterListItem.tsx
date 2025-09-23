@@ -3,15 +3,18 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AiCharacter } from '@/types/ai';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme';
 
 type Props = {
   character: AiCharacter;
 };
 
 export default function AiCharacterListItem({ character }: Props) {
+  const { theme } = useTheme();
+const Colors = theme;
+  const styles = createStyles(Colors); // <-- ШАГ 3 (часть 2)
   const router = useRouter();
-  const avatar = character.avatarUrl || `https://i.pravatar.cc/150?u=${character.id}`;
+  const avatar = character.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
 
   const handlePress = () => {
     // ИСПРАВЛЕНИЕ ЗДЕСЬ:
@@ -34,8 +37,8 @@ export default function AiCharacterListItem({ character }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const createStyles = (Colors: any) => StyleSheet.create({
+container: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -60,5 +63,4 @@ const styles = StyleSheet.create({
   persona: {
     fontSize: 14,
     color: Colors.textSecondary,
-  },
-});
+  },});

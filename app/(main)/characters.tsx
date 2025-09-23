@@ -1,14 +1,16 @@
-// app/(main)/characters.tsx
 import React from 'react';
 import { View, FlatList, ActivityIndicator, Text, StyleSheet, Pressable } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
 import { useGetAiCharactersQuery } from '@/store/services/aiCharactersApi';
 import AiCharacterListItem from '@/components/ai/AiCharacterListItem';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function AiCharactersScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+  
   const { data: characters, isLoading, isError } = useGetAiCharactersQuery();
 
   if (isLoading) {
@@ -58,7 +60,7 @@ export default function AiCharactersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,

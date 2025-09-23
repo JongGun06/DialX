@@ -5,13 +5,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'expo-router';
-
+import { useTheme } from '@/hooks/useTheme'; // <-- ШАГ 1
 import AuthLayout from '@/components/auth/AuthLayout';
 import StyledInput from '@/components/auth/StyledInput';
 import PrimaryButton from '@/components/auth/PrimaryButton';
 import { useRegisterMutation } from '@/store/services/authApi';
 import { RegisterData } from '@/types/auth';
-import { Colors } from '@/constants/Colors';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Имя пользователя минимум 3 символа'),
@@ -20,6 +19,9 @@ const registerSchema = z.object({
 });
 
 export default function RegisterScreen() {
+  const { theme } = useTheme(); // <-- ШАГ 2
+  const Colors = theme;
+  const styles = createStyles(Colors); 
   const router = useRouter();
   const [register, { isLoading }] = useRegisterMutation();
 
@@ -111,7 +113,7 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
   header: {
     alignItems: 'center',
     marginBottom: 40,

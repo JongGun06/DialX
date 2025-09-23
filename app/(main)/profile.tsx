@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme'; // 1. ИМПОРТИРУЕМ ХУК
 
 export default function ProfileScreen() {
   const { theme } = useTheme();
@@ -17,7 +17,7 @@ export default function ProfileScreen() {
     return <ActivityIndicator size="large" color={Colors.primary} style={styles.container} />;
   }
   
-  const avatar = currentUser.avatarUrl || `https://i.pravatar.cc/150?u=${currentUser.id}`;
+  const avatar = currentUser.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
 
   return (
     <View style={styles.container}>
@@ -28,7 +28,7 @@ export default function ProfileScreen() {
           {hasActiveSubscription && (
             <Ionicons name="shield-checkmark" size={24} color={Colors.primary} style={{ marginLeft: 8 }}/>
           )}
-        </View>
+        </View> 
       </View>
     </View>
   );

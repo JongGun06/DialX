@@ -1,15 +1,14 @@
-// components/chat/ChatListItem.tsx
-
 import React from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-
 import { Chat } from '@/types/chat';
-import { Colors } from '@/constants/Colors';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
+import { useTheme } from '@/hooks/useTheme';
+import { selectOnlineUserIds } from '@/store/slices/presenceSlice'; // <-- ДОБАВЛЕНО
+
 
 dayjs.extend(relativeTime);
 
@@ -18,34 +17,33 @@ type Props = {
 };
 
 export default function ChatListItem({ chat }: Props) {
+    const onlineUserIds = useAppSelector(selectOnlineUserIds); // <-- Получаем статусы
+    
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const router = useRouter();
   const currentUser = useAppSelector(selectCurrentUser);
 
-  // v-- ЗДЕСЬ ВСЯ НОВАЯ ЛОГИКА --v
   const getDisplayData = () => {
     if (chat.isGroup) {
-      // Для групп оставляем старую логику
       const name = chat.name || 'Новая группа';
-      const avatar = chat.avatarUrl || `https://i.pravatar.cc/150?u=${chat.id}`;
+      const avatar = chat.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
       return { name, avatar };
     } else {
-      // Для личных чатов ищем другого участника
       const otherParticipant = chat.participants?.find(p => p.id !== currentUser?.id);
-      
       if (otherParticipant) {
-        // И используем его данные
         const name = otherParticipant.username;
-        const avatar = otherParticipant.avatarUrl || `https://i.pravatar.cc/150?u=${otherParticipant.id}`;
-        return { name, avatar };
+        const avatar = otherParticipant.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
+                const isOnline = onlineUserIds[otherParticipant.id]; // <-- Проверяем статус
+        return { name, avatar,isOnline };
       }
-
-      // Запасной вариант, если что-то пошло не так
-      return { name: 'Личный чат', avatar: `https://i.pravatar.cc/150?u=${chat.id}` };
+      return { name: 'Личный чат', avatar: `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg` };
     }
   };
-  // ^-- КОНЕЦ НОВОЙ ЛОГИКИ --^
 
-  const { name, avatar } = getDisplayData();
+  const { name, avatar,isOnline } = getDisplayData();
   const lastMessage = chat.lastMessage;
 
   const handlePress = () => {
@@ -54,17 +52,20 @@ export default function ChatListItem({ chat }: Props) {
       params: { 
         id: chat.id,
         name, 
-        isGroup: chat.isGroup.toString() 
+        isGroup: (chat.isGroup ?? false).toString() 
       },
     });
   };
 
   return (
     <Pressable onPress={handlePress} style={styles.container}>
-      <Image source={{ uri: avatar }} style={styles.avatar} />
+      <View>
+        <Image source={{ uri: avatar }} style={styles.avatar} />
+        {isOnline && <View style={styles.onlineIndicator} />}
+      </View>
       <View style={styles.content}>
         <View style={styles.row}>
-          <Text style={styles.name} numberOfLines={1}>{name}</Text>
+          <Text style={styles.name}>{name}</Text>
           {lastMessage && (
             <Text style={styles.time}>{dayjs(lastMessage.createdAt).fromNow(true)}</Text>
           )}
@@ -77,7 +78,7 @@ export default function ChatListItem({ chat }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -115,5 +116,16 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  onlineIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.success,
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    borderWidth: 2,
+    borderColor: Colors.background,
   },
 });

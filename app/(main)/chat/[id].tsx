@@ -1,31 +1,21 @@
-// app/(main)/chat/[id].tsx
-
 import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  ActivityIndicator,
-  Text,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Pressable,
-} from 'react-native';
+import { View, FlatList, ActivityIndicator, Text, StyleSheet, KeyboardAvoidingView, Platform, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-
 import { useGetMessagesQuery, useSendMessageMutation } from '@/store/services/chatsApi';
 import { useUploadFileMutation } from '@/store/services/filesApi';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
-
 import MessageBubble from '@/components/chat/MessageBubble';
 import MessageInput from '@/components/chat/MessageInput';
-import { Colors } from '@/constants/Colors';
 import { Message } from '@/types/chat';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function ChatScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const router = useRouter();
   const { id: chatId, name, isGroup } = useLocalSearchParams<{ id: string; name: string; isGroup: string }>();
   const currentUser = useAppSelector(selectCurrentUser);
@@ -34,6 +24,7 @@ export default function ChatScreen() {
   const { data: messages, isLoading, isError } = useGetMessagesQuery(chatId!);
   const [sendMessage, { isLoading: isSendingText }] = useSendMessageMutation();
   const [uploadFile, { isLoading: isUploadingFile }] = useUploadFileMutation();
+
 
   const handleSendText = async (content: string) => {
     try {
@@ -90,11 +81,7 @@ export default function ChatScreen() {
   }
 
   if (isError || !messages) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Не удалось загрузить сообщения.</Text>
-      </View>
-    );
+    return <View style={styles.centered}><Text style={styles.errorText}>Не удалось загрузить сообщения.</Text></View>;
   }
 
   return (
@@ -108,7 +95,7 @@ export default function ChatScreen() {
           headerTitle: () => (
             <Pressable 
               disabled={isGroup !== 'true'}
-              onPress={() => router.push(`/(main)/chats/info/${chatId}`)}
+              onPress={() => router.push(`/(main)/chats/info/${chatId}` as any)}
             >
               <Text style={styles.headerTitle}>{name}</Text>
             </Pressable>
@@ -138,26 +125,10 @@ export default function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-  },
-  errorText: {
-    color: Colors.error,
-  },
-  listContent: {
-    paddingVertical: 8,
-  },
-  headerTitle: {
-    color: Colors.text,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+const createStyles = (Colors: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.background },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
+  errorText: { color: Colors.error },
+  listContent: { paddingVertical: 8 },
+  headerTitle: { color: Colors.text, fontSize: 18, fontWeight: 'bold' },
 });

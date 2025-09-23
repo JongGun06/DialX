@@ -6,7 +6,7 @@ export type Profile = {
   avatarUrl?: string;
   subscriptionStatus?: string;
   settings?: { // <-- ДОБАВЛЕНО
-    theme: string;
+    theme: { [key: string]: string }; // <-- ИЗМЕНЕНИЕ: Теперь это объект
   };
 };
 
@@ -17,6 +17,8 @@ export type Message = {
   fileType?: string | null;
   createdAt: string;
   author: Profile;
+    chatId?: string; // <-- ДОБАВИТЬ ЭТУ СТРОКУ
+
 };
 
 export type Chat = {

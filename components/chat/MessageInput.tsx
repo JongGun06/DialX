@@ -1,8 +1,7 @@
-// components/chat/MessageInput.tsx
 import React, { useState } from 'react';
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme';
 
 type Props = {
   onSend: (message: string) => void;
@@ -11,6 +10,10 @@ type Props = {
 };
 
 export default function MessageInput({ onSend, onAttach, isSending }: Props) {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const [text, setText] = useState('');
 
   const handleSend = () => {
@@ -36,10 +39,7 @@ export default function MessageInput({ onSend, onAttach, isSending }: Props) {
       <Pressable 
         onPress={handleSend} 
         disabled={isSending || text.trim().length === 0}
-        style={({ pressed }) => [
-          styles.sendButton,
-          { opacity: (isSending || text.trim().length === 0) ? 0.5 : (pressed ? 0.8 : 1) }
-        ]}
+        style={({ pressed }) => [styles.sendButton, { opacity: (isSending || text.trim().length === 0) ? 0.5 : (pressed ? 0.8 : 1) }]}
       >
         <Ionicons name="send" size={22} color="white" />
       </Pressable>
@@ -47,34 +47,9 @@ export default function MessageInput({ onSend, onAttach, isSending }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 25,
-    backgroundColor: Colors.surface,
-  },
-  attachButton: {
-    padding: 8,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    maxHeight: 100,
-    color: Colors.text,
-    fontSize: 16,
-    marginHorizontal: 8,
-  },
-  sendButton: {
-    backgroundColor: Colors.primary,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+const createStyles = (Colors: any) => StyleSheet.create({
+  container: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8, backgroundColor: Colors.surface },
+  attachButton: { padding: 8 },
+  input: { flex: 1, backgroundColor: Colors.background, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, maxHeight: 100, color: Colors.text, fontSize: 16, marginHorizontal: 8 },
+  sendButton: { backgroundColor: Colors.primary, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
 });

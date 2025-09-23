@@ -11,7 +11,7 @@ import type {
 import { API_BASE_URL } from '@/constants/api'; // <-- ИЗМЕНЕНИЕ
 
 
-type UploadResponse = {
+type UploadResponse = {    
   url: string;
   key: string;
 };

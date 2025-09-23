@@ -16,20 +16,17 @@ function AuthHandler() {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   
-  // Запускаем запрос на получение профиля, если пользователь залогинен,
-  // но данных о нем еще нет
   const { data: user, error, isLoading } = useGetMeQuery(undefined, {
     skip: !isLoggedIn,
   });
 
   useEffect(() => {
-    // Когда данные о пользователе успешно загружены, сохраняем их в store
     if (user) {
       dispatch(setCurrentUser(user));
     }
   }, [user, dispatch]);
 
-  return null; // Этот компонент не рендерит UI
+  return null;
 }
 
 function RootLayoutNav() {

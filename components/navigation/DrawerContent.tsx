@@ -3,15 +3,18 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
-import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function DrawerContent(props: any) {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const currentUser = useAppSelector(selectCurrentUser);
   const hasActiveSubscription = currentUser?.subscriptionStatus === 'ACTIVE';
-
-  const avatar = currentUser?.avatarUrl || `https://i.pravatar.cc/150?u=${currentUser?.id}`;
+  const avatar = currentUser?.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
 
   return (
     <View style={{ flex: 1 }}>
@@ -28,6 +31,7 @@ export default function DrawerContent(props: any) {
       </View>
 
       <DrawerContentScrollView {...props} style={{ backgroundColor: Colors.background, paddingTop: 10 }}>
+        {/* Здесь больше нет кастомных стилей, они будут браться из _layout */}
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
       
@@ -38,7 +42,7 @@ export default function DrawerContent(props: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingBottom: 20,

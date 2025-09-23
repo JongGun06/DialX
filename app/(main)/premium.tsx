@@ -3,20 +3,24 @@ import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
-import { Colors } from '@/constants/Colors';
 import PrimaryButton from '@/components/auth/PrimaryButton';
 import { useCreateCheckoutSessionMutation } from '@/store/services/stripeApi';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
+import { useTheme } from '@/hooks/useTheme';
 
-const FeatureItem = ({ text }: { text: string }) => (
-  <View style={styles.featureItem}>
+const FeatureItem = ({ text, Colors }: { text: string, Colors: any }) => (
+  <View style={createStyles(Colors).featureItem}>
     <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
-    <Text style={styles.featureText}>{text}</Text>
+    <Text style={createStyles(Colors).featureText}>{text}</Text>
   </View>
 );
 
 export default function PremiumScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const [createCheckoutSession, { isLoading }] = useCreateCheckoutSessionMutation();
   const currentUser = useAppSelector(selectCurrentUser);
   const hasActiveSubscription = currentUser?.subscriptionStatus === 'ACTIVE';
@@ -24,7 +28,7 @@ export default function PremiumScreen() {
   const handleSubscribe = async () => {
     try {
       const { url } = await createCheckoutSession().unwrap();
-      const result = await WebBrowser.openBrowserAsync(url);
+      await WebBrowser.openBrowserAsync(url);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
       Alert.alert('Ошибка', 'Не удалось перейти к оплате. Пожалуйста, попробуйте позже.');
@@ -42,10 +46,10 @@ export default function PremiumScreen() {
       </View>
 
       <View style={styles.features}>
-        <FeatureItem text="Безлимитное создание AI-персонажей" />
-        <FeatureItem text="Доступ к самым продвинутым языковым моделям" />
-        <FeatureItem text="Приоритетная поддержка" />
-        <FeatureItem text="Ранний доступ к новым функциям" />
+        <FeatureItem text="Безлимитное создание AI-персонажей" Colors={Colors} />
+        <FeatureItem text="Доступ к самым продвинутым языковым моделям" Colors={Colors} />
+        <FeatureItem text="Приоритетная поддержка" Colors={Colors} />
+        <FeatureItem text="Ранний доступ к новым функциям" Colors={Colors} />
       </View>
 
       {hasActiveSubscription ? (
@@ -70,7 +74,7 @@ export default function PremiumScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,

@@ -1,10 +1,7 @@
 // store/services/chatsApi.ts
 
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { io, Socket } from 'socket.io-client';
-import { RootState } from '@/store';
 import { Chat, Message } from '@/types/chat';
-import { API_BASE_URL } from '@/constants/api';
 import { baseQueryWithReauth } from '../baseQueryWithReauth';
 
 export const chatsApi = createApi({
@@ -32,39 +29,6 @@ export const chatsApi = createApi({
     getMessages: builder.query<Message[], string>({
       query: (chatId) => `/chats/${chatId}/messages`,
       providesTags: (result, error, id) => [{ type: 'Message', id }],
-      async onCacheEntryAdded(
-        chatId,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, getState }
-      ) {
-        const token = (getState() as RootState).auth.accessToken;
-        if (!token) return;
-
-        const socket: Socket = io(API_BASE_URL, {
-          extraHeaders: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        socket.on('connect', () => {
-          socket.emit('joinRoom', { chatId });
-        });
-        
-        socket.on('newMessage', (message: Message) => {
-          const currentUser = (getState() as RootState).auth.currentUser;
-          if (message.author.id === currentUser?.id) {
-            return;
-          }
-
-          updateCachedData((draft) => {
-            if (!draft.find((msg) => msg.id === message.id)) {
-                draft.push(message);
-            }
-          });
-        });
-
-        await cacheEntryRemoved;
-        socket.disconnect();
-      },
     }),
     sendMessage: builder.mutation<Message, { chatId: string; content?: string; fileUrl?: string }>({
       query: ({ chatId, ...body }) => ({
@@ -73,7 +37,7 @@ export const chatsApi = createApi({
         body,
       }),
       async onQueryStarted({ chatId, ...patch }, { dispatch, queryFulfilled, getState }) {
-        const currentUser = (getState() as RootState).auth.currentUser;
+        const currentUser = (getState() as any).auth.currentUser;
         if (!currentUser) return;
 
         const tempId = `temp_${Date.now()}`;
@@ -85,6 +49,7 @@ export const chatsApi = createApi({
               fileUrl: patch.fileUrl,
               createdAt: new Date().toISOString(),
               author: currentUser,
+              chatId: chatId, // <-- ИСПРАВЛЕНИЕ ЗДЕСЬ
             });
           })
         );

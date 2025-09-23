@@ -3,12 +3,15 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Alert } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme'; // <-- ШАГ 1
 import PrimaryButton from '@/components/auth/PrimaryButton';
 import StyledInput from '@/components/auth/StyledInput';
 import { useCreateGroupChatMutation } from '@/store/services/chatsApi';
 
 export default function FinalizeGroupScreen() {
+  const { theme } = useTheme(); // <-- ШАГ 2
+  const Colors = theme;
+  const styles = createStyles(Colors); 
   const router = useRouter();
   const params = useLocalSearchParams<{ userIds: string }>();
   const userIds = params.userIds?.split(',') || [];
@@ -60,7 +63,7 @@ export default function FinalizeGroupScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
   container: {
     flex: 1,
     backgroundColor: Colors.background,

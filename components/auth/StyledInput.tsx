@@ -1,7 +1,6 @@
-// components/auth/StyledInput.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle } from 'react-native';
-import { Colors } from '@/constants/Colors';
+import { defaultTheme as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
 
 interface Props extends TextInputProps {
   label: string;
@@ -11,15 +10,14 @@ interface Props extends TextInputProps {
 
 export default function StyledInput({ label, error, style, containerStyle, ...props }: Props) {
   const [isFocused, setIsFocused] = useState(false);
-
   const hasValue = props.value && props.value.length > 0;
+  
   const labelStyle = {
     position: 'absolute' as 'absolute',
-    left: 0,
+    left: 4,
     top: isFocused || hasValue ? 0 : 22,
     fontSize: isFocused || hasValue ? 12 : 16,
     color: isFocused ? Colors.primary : Colors.textSecondary,
-    backgroundColor: Colors.background,
     paddingHorizontal: 4,
     zIndex: 1,
   };
@@ -40,21 +38,7 @@ export default function StyledInput({ label, error, style, containerStyle, ...pr
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 24,
-    position: 'relative',
-  },
-  input: {
-    height: 50,
-    borderBottomWidth: 2,
-    color: Colors.text,
-    fontSize: 16,
-    paddingTop: 18,
-    paddingHorizontal: 4,
-  },
-  errorText: {
-    color: Colors.error,
-    marginTop: 4,
-    fontSize: 12,
-  },
+  container: { marginBottom: 24, position: 'relative' },
+  input: { height: 50, borderBottomWidth: 2, color: Colors.text, fontSize: 16, paddingTop: 18, paddingHorizontal: 4 },
+  errorText: { color: Colors.error, marginTop: 4, fontSize: 12 },
 });

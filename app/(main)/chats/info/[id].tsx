@@ -7,7 +7,7 @@ import { useGetChatDetailsQuery, useUpdateGroupAvatarMutation, useRemoveMemberFr
 import { useUploadFileMutation } from '@/store/services/filesApi';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme'; // <-- ШАГ 1
 import { Profile } from '@/types/chat';
 
 function MemberListItem({ 
@@ -19,7 +19,10 @@ function MemberListItem({
   isCurrentUser: boolean,
   onRemove: () => void,
 }) {
-  const avatar = member.avatarUrl || `https://i.pravatar.cc/150?u=${member.id}`;
+  const { theme } = useTheme(); // <-- ШАГ 2
+  const Colors = theme;
+  const styles = createStyles(Colors); 
+  const avatar = member.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
   return (
     <View style={styles.memberItem}>
       <Image source={{ uri: avatar }} style={styles.memberAvatar} />
@@ -34,6 +37,9 @@ function MemberListItem({
 }
 
 export default function GroupInfoScreen() {
+  const { theme } = useTheme(); // <-- ШАГ 2
+  const Colors = theme;
+  const styles = createStyles(Colors); 
   const router = useRouter();
   const { id: chatId } = useLocalSearchParams<{ id: string }>();
   const currentUser = useAppSelector(selectCurrentUser);
@@ -109,7 +115,7 @@ export default function GroupInfoScreen() {
     );
   }
 
-  const groupAvatar = chat.avatarUrl || `https://i.pravatar.cc/150?u=${chat.id}`;
+  const groupAvatar = chat.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
 
   return (
     <View style={styles.container}>
@@ -155,8 +161,8 @@ export default function GroupInfoScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-    centered: {
+const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSearchUsersQuery } from '@/store/services/profileApi';
 import { useGetChatDetailsQuery, useAddMembersToGroupMutation } from '@/store/services/chatsApi';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme'; // <-- ШАГ 1
 import PrimaryButton from '@/components/auth/PrimaryButton';
 import { Profile } from '@/types/chat';
 
@@ -21,7 +21,10 @@ function UserListItem({
   isSelected: boolean;
   onToggle: () => void;
 }) {
-  const avatar = user.avatarUrl || `https://i.pravatar.cc/150?u=${user.id}`;
+  const { theme } = useTheme(); // <-- ШАГ 2
+    const Colors = theme;
+    const styles = createStyles(Colors); 
+  const avatar = user.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
   return (
     <Pressable style={styles.userItem} onPress={onToggle}>
       <Image source={{ uri: avatar }} style={styles.avatar} />
@@ -36,6 +39,9 @@ function UserListItem({
 }
 
 export default function CreateChatScreen() {
+  const { theme } = useTheme(); // <-- ШАГ 2
+    const Colors = theme;
+    const styles = createStyles(Colors); 
   const router = useRouter();
   const params = useLocalSearchParams<{ chatId?: string }>();
   const isAddingMode = !!params.chatId;
@@ -146,7 +152,7 @@ export default function CreateChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
   container: {
     flex: 1,
     backgroundColor: Colors.background,

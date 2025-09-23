@@ -1,18 +1,22 @@
-// app/(main)/chats.tsx
-
 import React from 'react';
 import { View, FlatList, ActivityIndicator, Text, StyleSheet, Pressable } from 'react-native';
-import { useGetChatsQuery } from '@/store/services/chatsApi';
-import ChatListItem from '@/components/chat/ChatListItem';
-import { Colors } from '@/constants/Colors';
-import { DrawerActions } from '@react-navigation/native'; // <-- ДОБАВЛЕНО
 import { Stack, Link, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
+import { DrawerActions } from '@react-navigation/native';
+import { useGetChatsQuery } from '@/store/services/chatsApi';
+import ChatListItem from '@/components/chat/ChatListItem';
+import { useTheme } from '@/hooks/useTheme';
+import { useAppSelector } from '@/hooks/redux'; // <-- ДОБАВЛЕНО
+import { selectOnlineUserIds } from '@/store/slices/presenceSlice';
 
 export default function ChatsScreen() {
+  const { theme } = useTheme();
+  const Colors = theme;
+  const styles = createStyles(Colors);
+
   const { data: chats, isLoading, isError, error } = useGetChatsQuery();
-    const navigation = useNavigation(); // <-- ДОБАВЛЕНО
+  const onlineUserIds = useAppSelector(selectOnlineUserIds);
+  const navigation = useNavigation();
 
   if (isLoading) {
     return <ActivityIndicator size="large" color={Colors.primary} style={styles.centered} />;
@@ -23,7 +27,7 @@ export default function ChatsScreen() {
     return (
       <View style={styles.centered}>
         <Text style={styles.errorText}>Ошибка при загрузке чатов.</Text>
-      </View>
+      </View> 
     );
   }
 
@@ -61,12 +65,13 @@ export default function ChatsScreen() {
         data={chats}
         renderItem={({ item }) => <ChatListItem chat={item} />}
         keyExtractor={(item) => item.id}
+        extraData={onlineUserIds}
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,

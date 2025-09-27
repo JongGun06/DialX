@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle } from 'react-native';
-import { defaultTheme as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
+import { dark as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
 
 interface Props extends TextInputProps {
   label: string;

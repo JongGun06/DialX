@@ -4,7 +4,9 @@ export type Profile = {
   id: string;
   username: string;
   avatarUrl?: string;
-  subscriptionStatus?: string;
+  subscriptionStatus?: string; 
+  userId: string; // <-- ДОБАВЛЕНО ЭТО ПОЛЕ
+
   settings?: { // <-- ДОБАВЛЕНО
     theme: { [key: string]: string }; // <-- ИЗМЕНЕНИЕ: Теперь это объект
   };
@@ -28,4 +30,5 @@ export type Chat = {
   isGroup: boolean;
   participants: Profile[];
   lastMessage?: Message;
+  messages?: Message[]; // <-- ВОТ ИСПРАВЛЕНИЕ
 };

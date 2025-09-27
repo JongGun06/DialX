@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
@@ -36,51 +36,69 @@ export default function PremiumScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Stack.Screen options={{ title: 'DialX Premium' }} />
-      
-      <View style={styles.header}>
-        <Ionicons name="sparkles" size={60} color={Colors.primary} />
-        <Text style={styles.title}>Получите Premium</Text>
-        <Text style={styles.subtitle}>Разблокируйте все возможности нашего AI-ассистента</Text>
-      </View>
-
-      <View style={styles.features}>
-        <FeatureItem text="Безлимитное создание AI-персонажей" Colors={Colors} />
-        <FeatureItem text="Доступ к самым продвинутым языковым моделям" Colors={Colors} />
-        <FeatureItem text="Приоритетная поддержка" Colors={Colors} />
-        <FeatureItem text="Ранний доступ к новым функциям" Colors={Colors} />
-      </View>
-
-      {hasActiveSubscription ? (
-        <View style={styles.activeSubContainer}>
-          <Ionicons name="checkmark-circle" size={32} color={Colors.success} />
-          <Text style={styles.activeSubText}>У вас активна Premium подписка!</Text>
-          <Text style={styles.footerText}>Спасибо за вашу поддержку.</Text>
+    <ImageBackground
+      source={theme.wallpaperUrl ? { uri: theme.wallpaperUrl } : undefined}
+      style={styles.backgroundImage}
+      imageStyle={{ opacity: 0.1 }}
+      resizeMode="cover"
+    >
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <Stack.Screen options={{ 
+          title: 'DialX Premium',
+          headerStyle: { backgroundColor: Colors.surface },
+          headerTintColor: Colors.text,
+          headerTransparent: true,
+        }} />
+        
+        <View style={styles.header}>
+          <Ionicons name="sparkles" size={60} color={Colors.primary} />
+          <Text style={styles.title}>Получите Premium</Text>
+          <Text style={styles.subtitle}>Разблокируйте все возможности нашего AI-ассистента</Text>
         </View>
-      ) : (
-        <View style={styles.footer}>
-          <PrimaryButton
-            title="Подписаться за $5.00/мес"
-            onPress={handleSubscribe}
-            isLoading={isLoading}
-          />
-          <Text style={styles.footerText}>
-            Подписку можно отменить в любой момент.
-          </Text>
+
+        <View style={styles.features}>
+          <FeatureItem text="Безлимитное создание AI-персонажей" Colors={Colors} />
+          <FeatureItem text="Доступ к самым продвинутым языковым моделям" Colors={Colors} />
+          <FeatureItem text="Приоритетная поддержка" Colors={Colors} />
+          <FeatureItem text="Ранний доступ к новым функциям" Colors={Colors} />
         </View>
-      )}
-    </ScrollView>
+
+        {hasActiveSubscription ? (
+          <View style={styles.activeSubContainer}>
+            <Ionicons name="checkmark-circle" size={32} color={Colors.success} />
+            <Text style={styles.activeSubText}>У вас активна Premium подписка!</Text>
+            <Text style={styles.footerText}>Спасибо за вашу поддержку.</Text>
+          </View>
+        ) : (
+          <View style={styles.footer}>
+            <PrimaryButton
+              title="Подписаться за $5.00/мес"
+              onPress={handleSubscribe}
+              isLoading={isLoading}
+            />
+            <Text style={styles.footerText}>
+              Подписку можно отменить в любой момент.
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
 const createStyles = (Colors: any) => StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
     backgroundColor: Colors.background,
   },
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    paddingTop: 100
+  },
   contentContainer: {
     padding: 24,
+    paddingTop: 120, // Отступ для прозрачного заголовка
   },
   header: {
     alignItems: 'center',
@@ -110,6 +128,7 @@ const createStyles = (Colors: any) => StyleSheet.create({
     color: Colors.text,
     fontSize: 16,
     marginLeft: 16,
+    flex: 1, // Для переноса длинного текста
   },
   footer: {
     alignItems: 'center',

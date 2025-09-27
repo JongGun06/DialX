@@ -15,9 +15,11 @@ import { ThemeProvider } from '@/context/ThemeContext'; // <-- ДОБАВЛЕН�
 function AuthHandler() {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const accessToken = useAppSelector((state) => state.auth.accessToken)
+
   
   const { data: user, error, isLoading } = useGetMeQuery(undefined, {
-    skip: !isLoggedIn,
+    skip: !accessToken,
   });
 
   useEffect(() => {

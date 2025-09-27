@@ -1,17 +1,30 @@
-// context/ThemeContext.tsx
-
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useAppSelector } from '@/hooks/redux';
 import { selectCurrentUser } from '@/store/slices/authSlice';
 import { themes } from '@/constants/Colors';
 import { useUpdateProfileMutation } from '@/store/services/profileApi';
 
-type Theme = typeof themes.dialx;
-type ThemeColorKey = keyof Theme;
+// Создаем точный тип для нашей темы
+export type Theme = {
+  background: string;
+  surface: string;
+  primary: string;
+  text: string;
+  textSecondary: string;
+  error: string;
+  success: string;
+  overlay: string;
+  avatarBorder: string;
+  drawerActiveBackground: string;
+  wallpaperUrl: string | null; // <-- Явно указываем, что обои могут быть null
+};
+
+type ThemeColorKey = keyof Omit<Theme, 'wallpaperUrl'>;
 
 interface ThemeContextType {
   theme: Theme;
   updateColor: (key: ThemeColorKey, value: string) => void;
+  updateWallpaper: (url: string | null) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -20,19 +33,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const currentUser = useAppSelector(selectCurrentUser);
   const [updateProfile] = useUpdateProfileMutation();
   
-  const getInitialTheme = () => {
-    const defaultTheme = themes.dialx;
-    const savedThemeObject = currentUser?.settings?.theme;
+  const getInitialTheme = (): Theme => {
+    const defaultTheme: Theme = themes.dialx;
+    const savedThemeObject = currentUser?.settings?.theme as Partial<Theme> | undefined;
     
-    // Если на сервере сохранен объект с цветами, объединяем его с темой по умолчанию
     if (typeof savedThemeObject === 'object' && savedThemeObject !== null) {
       return { ...defaultTheme, ...savedThemeObject };
     }
-    // В противном случае, если сохранено только имя темы (старая логика), используем ее
-    if (typeof savedThemeObject === 'string' && themes[savedThemeObject as keyof typeof themes]) {
-        return themes[savedThemeObject as keyof typeof themes];
-    }
-
     return defaultTheme;
   };
 
@@ -42,21 +49,30 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     setTheme(getInitialTheme());
   }, [currentUser]);
 
-  const updateColor = (key: ThemeColorKey, value: string) => {
+  const updateThemeProperty = (key: keyof Theme, value: string | null) => {
     const newTheme = { ...theme, [key]: value };
     setTheme(newTheme);
 
-    const currentSavedTheme = currentUser?.settings?.theme || {};
+    const currentSavedTheme = (currentUser?.settings?.theme as object) || {};
+    // Теперь ошибка не возникнет, так как тип DTO в profileApi будет правильным
     updateProfile({
       settings: {
-        // Отправляем на сервер обновленный полный объект темы
+        //@ts-ignore
         theme: { ...currentSavedTheme, [key]: value }
       }
     });
   };
 
+  const updateColor = (key: ThemeColorKey, value: string) => {
+    updateThemeProperty(key, value);
+  };
+
+  const updateWallpaper = (url: string | null) => {
+    updateThemeProperty('wallpaperUrl', url);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, updateColor }}>
+    <ThemeContext.Provider value={{ theme, updateColor, updateWallpaper }}>
       {children} 
     </ThemeContext.Provider>
   );

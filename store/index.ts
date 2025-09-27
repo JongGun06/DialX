@@ -5,21 +5,22 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { authApi } from './services/authApi';
 import { chatsApi } from './services/chatsApi';
 import { profileApi } from './services/profileApi';
-import { filesApi } from './services/filesApi';
 import { aiCharactersApi } from './services/aiCharactersApi';
 import { stripeApi } from './services/stripeApi'; // <-- ДОБАВЛЕНО
 import authReducer, { logout } from './slices/authSlice';
-import presenceReducer from './slices/presenceSlice'; // <-- ДОБАВЛЕНО
+import presenceReducer from './slices/presenceSlice'; // <-- 1. Импортируем
+import { filesApi } from './services/filesApi'; // <-- 1. ИМПОРТИРУЙ ЕГО
+
 
 
 const appReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   [chatsApi.reducerPath]: chatsApi.reducer,
   [profileApi.reducerPath]: profileApi.reducer,
-  [filesApi.reducerPath]: filesApi.reducer,
   [aiCharactersApi.reducerPath]: aiCharactersApi.reducer,
   [stripeApi.reducerPath]: stripeApi.reducer, // <-- ДОБАВЛЕНО
   auth: authReducer,
+  [filesApi.reducerPath]: filesApi.reducer, // <-- 2. ДОБАВЬ ЕГО REDUCER
   presence: presenceReducer,
 });
 

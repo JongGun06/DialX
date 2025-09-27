@@ -93,6 +93,8 @@ export default function MainLayout() {
       <Drawer.Screen name="chats/finalize" options={{ drawerItemStyle: { display: 'none' } }} />
       <Drawer.Screen name="chats/info/[id]" options={{ drawerItemStyle: { display: 'none' } }} />
       <Drawer.Screen name="premium" options={{ drawerItemStyle: { display: 'none' } }} />
+      <Drawer.Screen name="payment-success" options={{ drawerItemStyle: { display: 'none' } }} />
+      <Drawer.Screen name="payment-canceled" options={{ drawerItemStyle: { display: 'none' } }} />
     </Drawer>
   );
 }

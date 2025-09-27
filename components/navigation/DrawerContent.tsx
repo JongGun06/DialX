@@ -30,9 +30,8 @@ export default function DrawerContent(props: any) {
         </SafeAreaView>
       </View>
 
-      <DrawerContentScrollView {...props} style={{ backgroundColor: Colors.background, paddingTop: 10 }}>
-        {/* Здесь больше нет кастомных стилей, они будут браться из _layout */}
-        <DrawerItemList {...props} />
+      <DrawerContentScrollView {...props} style={{ backgroundColor: Colors.background, paddingTop:10}}>
+        <DrawerItemList {...props}/>
       </DrawerContentScrollView>
       
       <View style={styles.footer}>

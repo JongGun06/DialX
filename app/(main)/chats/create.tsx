@@ -1,7 +1,7 @@
 // app/(main)/chats/create.tsx
 
 import React, { useState, useMemo } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, Image, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { View, TextInput, FlatList, Text, StyleSheet, Image, Pressable, ActivityIndicator, Alert, ImageBackground } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -107,6 +107,12 @@ export default function CreateChatScreen() {
   const isButtonDisabled = isAddingMode ? selectedUsersCount === 0 : selectedUsersCount < 1;
 
   return (
+  <ImageBackground
+    source={theme.wallpaperUrl ? { uri: theme.wallpaperUrl } : undefined}
+    style={styles.backgroundImage}
+    imageStyle={{ opacity: 0.1 }}
+    resizeMode="cover"
+  >
     <View style={styles.container}>
       <Stack.Screen options={{ title: isAddingMode ? 'Добавить участников' : 'Новый чат' }} />
       <View style={styles.searchContainer}>
@@ -133,7 +139,7 @@ export default function CreateChatScreen() {
           />
         )}
         ListEmptyComponent={() =>
-          !isSearching && debouncedQuery.length > 1 ? ( // <-- ИСПРАВЛЕНИЕ ЗДЕСЬ
+          !isSearching && debouncedQuery.length > 1 ? (
             <Text style={styles.emptyText}>Пользователи не найдены.</Text>
           ) : null
         }
@@ -149,13 +155,16 @@ export default function CreateChatScreen() {
         </View>
       )}
     </View>
-  );
+  </ImageBackground>
+);
+
 }
 
 const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'transparent',
+    padding: 16,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -201,4 +210,9 @@ const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (ча�
     textAlign: 'center',
     marginTop: 20,
   },
+  backgroundImage: {
+  flex: 1,
+  backgroundColor: Colors.background,
+},
+
 });

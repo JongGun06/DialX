@@ -48,8 +48,34 @@ export default function MessageInput({ onSend, onAttach, isSending }: Props) {
 }
 
 const createStyles = (Colors: any) => StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8, backgroundColor: Colors.surface },
-  attachButton: { padding: 8 },
-  input: { flex: 1, backgroundColor: Colors.background, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, maxHeight: 100, color: Colors.text, fontSize: 16, marginHorizontal: 8 },
-  sendButton: { backgroundColor: Colors.primary, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  container: { 
+    flexDirection: 'row', 
+    alignItems: 'flex-end', // Выравниваем по низу для multiline
+    paddingHorizontal: 8, 
+    paddingVertical: 8, 
+    backgroundColor: Colors.surface,
+  },
+  attachButton: { 
+    padding: 8,
+    marginBottom: 5, // Небольшой отступ для выравнивания
+  },
+  input: {
+  flex: 1,
+  backgroundColor: Colors.background,
+  borderRadius: 20,
+  paddingHorizontal: 14,
+  paddingVertical: 8,
+  fontSize: 16,
+  color: Colors.text,
+  maxHeight: 120,
+},
+  sendButton: { 
+    backgroundColor: Colors.primary, 
+    width: 44, // Немного увеличим для удобства
+    height: 44,
+    borderRadius: 22, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    marginBottom: 1,
+  },
 });

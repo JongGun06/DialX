@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { defaultTheme as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
+import { dark as Colors } from '@/constants/Colors'; // <-- ИЗМЕНЕНИЕ
 
 
 

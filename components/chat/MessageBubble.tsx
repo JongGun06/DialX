@@ -5,9 +5,9 @@ import { useTheme } from '@/hooks/useTheme';
 
 type Props = {
   content?: string;
-  fileUrl?: string;
+  fileUrl?: string; 
   createdAt: string;
-  isOwn: boolean;
+  isOwn: boolean;  
 };
 
 export default function MessageBubble({ content, fileUrl, createdAt, isOwn }: Props) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, Pressable, Alert, ImageBackground } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -118,6 +118,12 @@ export default function GroupInfoScreen() {
   const groupAvatar = chat.avatarUrl || `https://i.pinimg.com/736x/ca/8c/7d/ca8c7de3ae607348b5d3f124eba8a3ee.jpg`;
 
   return (
+  <ImageBackground
+    source={theme.wallpaperUrl ? { uri: theme.wallpaperUrl } : undefined}
+    style={styles.backgroundImage}
+    imageStyle={{ opacity: 0.1 }}
+    resizeMode="cover"
+  >
     <View style={styles.container}>
       <Stack.Screen options={{ title: 'Инфо о группе' }} />
       <FlatList
@@ -158,7 +164,9 @@ export default function GroupInfoScreen() {
         }
       />
     </View>
-  );
+  </ImageBackground>
+);
+
 }
 
 const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (часть 1)
@@ -170,7 +178,8 @@ const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (ча�
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'transparent',
+    padding: 16,
   },
   headerContainer: {
     alignItems: 'center',
@@ -241,4 +250,9 @@ const createStyles = (Colors: any) => StyleSheet.create({ // <-- ШАГ 3 (ча�
     fontSize: 16,
     marginLeft: 12,
   },
+  backgroundImage: {
+  flex: 1,
+  backgroundColor: Colors.background,
+},
+
 });

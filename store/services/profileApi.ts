@@ -1,20 +1,21 @@
 // store/services/profileApi.ts
 
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { io, Socket } from 'socket.io-client';
-import { Profile, Message } from '@/types/chat';
+import { Profile, Chat } from '@/types/chat'; // <-- Убедись, что Chat импортирован
 import { baseQueryWithReauth } from '../baseQueryWithReauth';
-import { API_BASE_URL } from '@/constants/api';
 import { RootState } from '..';
-import { setInitialOnlineUsers, userCameOnline, userWentOffline } from '../slices/presenceSlice';
 import { chatsApi } from './chatsApi';
+import { initializeSocket, disconnectSocket } from '../socket';
+import { setInitialOnlineUsers, userCameOnline, userWentOffline } from '../slices/presenceSlice';
+
 
 type UpdateProfileDto = {
     username?: string;
     settings?: {
-        theme: { [key: string]: string }; // Тема теперь - это объект с цветами
+        theme: { [key: string]: string };
     };
 }
+
 export const profileApi = createApi({
   reducerPath: 'profileApi',
   baseQuery: baseQueryWithReauth,
@@ -29,50 +30,61 @@ export const profileApi = createApi({
       ) {
         await cacheDataLoaded;
         const token = (getState() as RootState).auth.accessToken;
-        if (!token) return;
+        
+        if (token) {
+          // Инициализируем сокет и получаем его единственный экземпляр
+          const socket = initializeSocket(token);
 
-        console.log(`[Socket] Попытка подключения к: ${API_BASE_URL}`);
-        const socket: Socket = io(API_BASE_URL, {
-          auth: { token: token },
-          transports: ['websocket', 'polling'],
-        });
+          // --- ВСЕ ГЛОБАЛЬНЫЕ СЛУШАТЕЛИ ТЕПЕРЬ НАХОДЯТСЯ ЗДЕСЬ ---
+          socket.on('connect', () => console.log(`[Socket] Глобальный сокет подключен! ID: ${socket.id}`));
+          socket.on('disconnect', (reason) => console.log(`[Socket] Глобальный сокет отключен: ${reason}`));
 
-        socket.on('connect', () => console.log(`[Socket] Успешно подключено! ID сокета: ${socket.id}`));
-        socket.on('disconnect', (reason) => console.log(`[Socket] Отключено по причине: ${reason}`));
-        socket.on('connect_error', (err) => console.error(`[Socket] ОШИБКА ПОДКЛЮЧЕНИЯ: ${err.message}`));
+          // Слушатель для новых чатов
+          socket.on('newChat', (newChat: Chat) => {
+            console.log('[Socket] 📩 ПОЛУЧЕН НОВЫЙ ЧАТ:', newChat);
+            dispatch(
+              chatsApi.util.updateQueryData('getChats', undefined, (draft) => {
+                if (!draft.find((chat) => chat.id === newChat.id)) {
+                  draft.unshift(newChat);
+                }
+              })
+            );
+          });
+          socket.on('onlineUsersList', (userIds: string[]) => {
+            console.log('[Socket] Получен список онлайн-пользователей:', userIds);
+            dispatch(setInitialOnlineUsers(userIds));
+          });
+  
+          socket.on('presenceUpdate', (data: { userId: string; status: 'online' | 'offline' }) => {
+            console.log('[Socket] Получено обновление статуса:', data);
+            const { userId, status } = data;
+            if (status === 'online') {
+              dispatch(userCameOnline(userId));
+            } else {
+              dispatch(userWentOffline(userId));
+            }
+          });
 
-        socket.on('onlineUsersList', (userIds: string[]) => {
-          console.log('[Socket] Получен список онлайн-пользователей:', userIds);
-          dispatch(setInitialOnlineUsers(userIds));
-        });
-
-        socket.on('presenceUpdate', (data) => {
-          console.log('[Socket] Получено обновление статуса:', data);
-          const { userId, status } = data;
-          if (status === 'online') dispatch(userCameOnline(userId));
-          else dispatch(userWentOffline(userId));
-        });
-
-        // САМЫЙ ВАЖНЫЙ СЛУШАТЕЛЬ
-        socket.on('newMessage', (message: Message) => {
-          console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-          console.log('[Socket] ПОЛУЧЕНО НОВОЕ СООБЩЕНИЕ:', JSON.stringify(message, null, 2));
-          console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-          
-          const currentUser = (getState() as RootState).auth.currentUser;
-          if (message.author.id === currentUser?.id) return;
-          
-          dispatch(chatsApi.util.updateQueryData('getMessages', message.chatId!, (draft) => {
-            if (!draft.find((msg) => msg.id === message.id)) draft.push(message);
-          }));
-          dispatch(chatsApi.util.updateQueryData('getChats', undefined, (draft) => {
-            const chat = draft.find(c => c.id === message.chatId);
-            if (chat) chat.lastMessage = message;
-          }));
-        });
-
+          // Слушатели для системы присутствия (онлайн-статус)
+          socket.on('onlineUsersList', (userIds: string[]) => {
+            console.log('[Socket] Получен список онлайн-пользователей:', userIds);
+            dispatch(setInitialOnlineUsers(userIds));
+          });
+  
+          socket.on('presenceUpdate', (data: { userId: string; status: 'online' | 'offline' }) => {
+            console.log('[Socket] Получено обновление статуса:', data);
+            const { userId, status } = data;
+            if (status === 'online') {
+              dispatch(userCameOnline(userId));
+            } else {
+              dispatch(userWentOffline(userId));
+            }
+          });
+        }
+        
+        // При выходе из приложения или размонтировании компонента - отключаемся
         await cacheEntryRemoved;
-        socket.disconnect();
+        disconnectSocket();
       },
     }),
     updateAvatar: builder.mutation<Profile, { avatarUrl: string }>({
@@ -100,6 +112,6 @@ export const profileApi = createApi({
 export const {
   useGetMeQuery,
   useUpdateAvatarMutation,
-  useUpdateProfileMutation, // <-- ДОБАВЛЕНО
-  useSearchUsersQuery, // <-- ВОТ ЭТА СТРОКА БЫЛА ПРОПУЩЕНА
+  useUpdateProfileMutation,
+  useSearchUsersQuery,
 } = profileApi;
